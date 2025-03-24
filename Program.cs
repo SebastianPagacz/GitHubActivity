@@ -11,7 +11,8 @@ internal class Program
 {
     static async Task Main(string[] args)
     {
-        string url = "https://api.github.com/users/SebastianPagacz/events/public";
+        string user = "SebastianPagacz";
+        string url = $"https://api.github.com/users/{user}/events/public";
 
         using (HttpClient client = new HttpClient())
         {
@@ -21,11 +22,24 @@ internal class Program
             var result = await client.GetAsync(url);
             var json = await result.Content.ReadAsStringAsync();
             var deserializedData = JsonConvert.DeserializeObject<List<Activity>>(json);
-            
-            foreach (Activity i in deserializedData)
+
+            var groupByActivity = from activity in deserializedData group activity by activity.Type into newGroup select newGroup;
+
+            foreach (var i in groupByActivity)
             {
-                Console.WriteLine($"{i.Repo.Name} : {i.Type}");
+                Console.WriteLine($"{i.Key}");
+                foreach (var j in i)
+                {
+                    Console.WriteLine($"{j.Actor.Login} : {j.CreatedAt} : {j.Repo.Name} : {j.Type}");
+                }
             }
+
+            int countPushes = deserializedData.Count(p => p.Type == "PushEvent");
+            int countCreates = deserializedData.Count(p => p.Type == "CreateEvent");
+            int countReleases = deserializedData.Count(p => p.Type == "ReleaseEvent");
+            Console.WriteLine($"{user} pushed {countPushes} commits");
+            Console.WriteLine($"{user} created {countCreates}");
+            Console.WriteLine($"{user} realeased {countReleases} project");
         }
     }
 }
