@@ -11,8 +11,8 @@ internal class Program
 {
     static async Task Main(string[] args)
     {
-        string user = "SebastianPagacz";
-        string url = $"https://api.github.com/users/{user}/events/public";
+        //string user = "SebastianPagacz";
+        string url = "https://localhost:7168/weatherforecast";
 
         using (HttpClient client = new HttpClient())
         {
